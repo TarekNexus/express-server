@@ -48,7 +48,7 @@ initDB();
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello Tareks World!");
 });
-
+// users CRUD
 app.post("/users", async (req: Request, res: Response) => {
   const { name, email } = req.body;
   try {
@@ -70,11 +70,13 @@ app.post("/users", async (req: Request, res: Response) => {
     });
   }
 
-  res.status(201).json({
-    success: true,
-    message: "Tarek vai is comming ........",
-  });
+ 
 });
+
+app.get("/users", async(req: Request, res: Response) => {
+  res.send("Hello Tareks World!");
+});
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
