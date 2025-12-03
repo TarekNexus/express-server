@@ -69,7 +69,7 @@ app.post("/users", async (req: Request, res: Response) => {
     });
   }
 });
-
+// get all users 
 app.get("/users", async (req: Request, res: Response) => {
   try {
     const result = await pool.query(`SELECT * FROM users`);
@@ -85,7 +85,7 @@ app.get("/users", async (req: Request, res: Response) => {
     });
   }
 });
-
+// get single user
 app.get("/users/:id", async (req: Request, res: Response) => {
   try {
     const result = await pool.query(`SELECT * FROM users WHERE id=$1`, [
