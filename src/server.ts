@@ -1,4 +1,3 @@
-
 import express, { NextFunction, Request, Response } from "express";
 import { Pool } from "pg";
 import dotenv from "dotenv";
@@ -46,16 +45,13 @@ const initDB = async () => {
 
 initDB();
 
-
 // logger middleware
 const logger = (req: Request, res: Response, next: NextFunction) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}\n`);
   next();
 };
 
-
-
-app.get("/", logger,(req: Request, res: Response) => {
+app.get("/", logger, (req: Request, res: Response) => {
   res.send("Hello Tareks World!");
 });
 // users CRUD
@@ -212,15 +208,94 @@ app.get("/todos", async (req: Request, res: Response) => {
     });
   }
 });
+// get single todos
+app.get("/todos/:id", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM todos WHERE id=$1`, [
+      req.params.id,
+    ]);
 
+    if (result.rows.length === 0) {
+      res.status(500).json({
+        success: false,
+        message: "todos not found!",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "todos retrieved successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+// get single todo update
+app.put("/todos/:id", async (req: Request, res: Response) => {
+  const { title, completed } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE todos  SET title = $1, completed = $2 WHERE id=$3 RETURNING *`,
+      [title, completed, req.params.id]
+    );
 
-app.use((req,res)=>{
-res.status(404).json({
-    success:false,
-    message:"Route not found",
-    path:req.path
-})
-})
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        Error: "todo not found!",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "todo updated  successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+
+// get single user delete
+app.delete("/todos/:id", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`DELETE FROM todos WHERE id=$1`, [
+      req.params.id,
+    ]);
+
+    if (result.rowCount === 0) {
+      res.status(500).json({
+        success: false,
+        message: "todos not found!",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "todos deteled successfully",
+        data: result.rows,
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    path: req.path,
+  });
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
