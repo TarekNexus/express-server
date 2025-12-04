@@ -5,7 +5,7 @@ import auth from '../../middleware/auth';
 const router=express.Router()
 // app.use("/users",userRoutes)
 router.post("/",UserControllers.createUser);
-router.get("/",logger,auth(),UserControllers.getUser)
+router.get("/",logger,auth("admin","user"),UserControllers.getUser)
 router.get("/:id",UserControllers.getSingleUser)
 router.put("/:id",UserControllers.updatedUser)
 router.delete("/:id",UserControllers.deleteUser)
